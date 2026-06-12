@@ -1,6 +1,6 @@
 import jwt
 from jwt.error import InvalidTokenError
-from fastapi.security import OAuthPasswordBearer
+from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends
 from datetime import datetime, timezone, timedelta
 
