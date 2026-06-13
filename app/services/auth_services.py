@@ -5,10 +5,12 @@ import secrets
 from ..auths.password_handler import (hash_password, verify_password, DUMMY_HASH)
 from app.auths.token_handler import hash_token, verify_token
 from app.core.dotenv_config import EMAIL_VERIFICATION_TOKEN_EXPIRY
-from app.repositories.auth_repo import create_credential_user_token_repo,get_verify_email_token_repo, update_verify_email_token_repo
-
-
-
+from app.repositories.auth_repo import (
+    create_credential_user_token_repo,
+    get_verify_email_token_repo, 
+    update_verify_email_token_repo, 
+    get_current_user_id_role_repo)
+from app.exceptions.auth_exceptions import *
 def create_email_verification_token_service():
     #creates the token using secrete lib
     token = secrets.token_urlsafe(32)
@@ -57,7 +59,39 @@ def verify_email_token_service(credential_id: str, token: str):
     except Exception:
         raise
     
+def validate_credentials(email: str, plain_password: str):
+    try:
+        user_details = get_current_user_id_role_repo(email)
+        if user_details is None:
+            verify_password(plain_password, DUMMY_HASH)
+            raise EmailNotFoundError("Email not found")
+        user_details_dict ={
+            "user_id": user_details[0],
+            "role": user_details[1],
+            "is_verified":user_details[2],
+            "access_revoked":user_details[3],
+            "hashed_password": user_details[4]    
+            }
+        if not verify_password(plain_password, user_details_dict.get("hashed_password")):
+            raise PasswordInvalidError("Password Invalid")
 
+        if not user_details_dict.get("is_verified"):
+            raise  EmailNotVerifiedError("The email account not verified")
+
+        if user_details_dict.get("access_revoked"):
+            raise AccessDeniedError("Access denied/ Account access revoked")
+
+    except Exception as e:
+        raise 
+    else:
+        return {
+            "user_id": user_details_dict.get("user_id"),
+            "role": user_details_dict.get("role")
+        }
+
+
+    
+   
 
 
 #for testing

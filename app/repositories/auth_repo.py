@@ -1,5 +1,17 @@
 from app.db.db_connection import get_cur
 
+def get_current_user_id_role_repo(email:str):
+    with get_cur() as cur:
+        cur.execute(
+            """
+            SELECT u.user_id, u.role, ac.is_verified, ac.access_revoked, ac.hashed_password
+            FROM users u 
+            JOIN auth_credentials ac 
+            ON u.credential_id = ac.credential_id
+            WHERE email = %s
+            """, (email,))
+        row = cur.fetchone()
+    return row
 
 def create_credential_user_token_repo(email, hashed_password, token, expires_at):
     with get_cur() as cur:

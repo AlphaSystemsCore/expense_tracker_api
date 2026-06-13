@@ -4,9 +4,9 @@ import os
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-ALGORITHM = os.getenv('ALGORITHM')
 TOKEN_EXPIRE_TIME = int(os.getenv('TOKEN_EXPIRE_TIME'))
 EMAIL_VERIFICATION_TOKEN_EXPIRY = int(os.getenv('EMAIL_VERIFICATION_TOKEN_EXPIRY'))
+ALG= os.getenv('ALG')
 
 # FOR DEBUGGING
 if __name__ == "__main__":
