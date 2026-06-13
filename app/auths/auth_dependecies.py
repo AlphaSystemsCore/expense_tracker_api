@@ -8,9 +8,9 @@ from typing import Annotated
 from app.core.dotenv_config import SECRET_KEY, ALG
 
 ALGORITHM = ALG
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-async def create_token(claim: dict, expiry_delta:timedelta| None = None):
+def create_token(claim: dict, expiry_delta:timedelta| None = None):
     to_encode = claim.copy()
     if expiry_delta:
         exp = datetime.now(timezone.utc) + expiry_delta
@@ -20,24 +20,23 @@ async def create_token(claim: dict, expiry_delta:timedelta| None = None):
     encoded = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded
 
-async def get_current_user_id_role(token: Annotated[str, Depends(oauth2_scheme)]):
+def get_current_user_id_role(token: Annotated[str, Depends(oauth2_scheme)]):
     CredentialError = HTTPException(
         status_code=401,
         detail="Could not verify credentials",
-        header={"Authenticate":"Bearer"}
+        headers={"Authenticate":"Bearer"}
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALG])
         user_id = payload.get("sub")
         role = payload.get("role")
         print(role)
         print(user_id)
         if not user_id:
             raise CredentialError
-        #Ill also check when user exists in the database
-    
+        # Ill also check when user exists in the database
     except InvalidTokenError:
-        raise CredentialError
+            raise CredentialError
     else: 
         return {
             "user_id": user_id,
@@ -53,8 +52,7 @@ async def get_current_admin(user: Annotated[dict, Depends(get_current_user_id_ro
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Not Admin"
     )
-        
-    pass
+
 
 async def get_current_user(user: Annotated[dict, Depends(get_current_user_id_role)]):
     if user.get("role") == "user" or  user.get("role") == "admin":

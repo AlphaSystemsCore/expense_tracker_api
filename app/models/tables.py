@@ -39,11 +39,12 @@ tables = ("""
         """
         CREATE TABLE IF NOT EXISTS time_metadata (
         time_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        datetime TIMESTAMP NOT NULL,
+        datetime TIMESTAMPTZ NOT NULL,
         day VARCHAR(15) NOT NULL,
         month VARCHAR(15) NOT NULL,
         year INT NOT NULL,
         day_of_week INT NOT NULL,
+        day_of_month INT NOT NULL,
         week_of_year INT NOT NULL,
         day_of_year INT NOT NULL
 

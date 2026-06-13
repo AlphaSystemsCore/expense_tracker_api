@@ -9,7 +9,7 @@ from app.exceptions.auth_exceptions import *
 from app.auths.auth_dependecies import create_token
 from app.core.dotenv_config import TOKEN_EXPIRE_TIME
 
-auth_router = APIRouter()
+auth_router = APIRouter(tags=['auths'])
     
 @auth_router.post("/auth/register")
 async def register(user_in: User_In = Form(...)):
@@ -71,12 +71,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             "sub":sub,
             "role": role
         }
-        print(payload)
-        access_token = await create_token(payload, expire_delta)
+        access_token = create_token(payload, expire_delta)
         return {
-            "acess_token": access_token,
-            "token_type": "bearer",
-            "message": "log in successfull"
+            "access_token": access_token,
+            "token_type": "Bearer",
         }
         
 
