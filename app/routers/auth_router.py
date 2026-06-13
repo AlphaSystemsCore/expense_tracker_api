@@ -13,7 +13,7 @@ async def register(user_in: User_In = Form(...)):
         return {"message":"passwords didn't match"}
     try:
         token_infor = create_user_service(user_in.email, user_in.password)
-        message = f"http://127.0.0.1:8000/auth/verify/email/{token_infor[1]}/{token_infor[0]}"
+        message = f"http://127.0.0.1:8000/auth/verify/email/{token_infor.get("credential_id")}/{token_infor.get("token")}"
 
     except Exception as e:
         raise HTTPException(
@@ -38,7 +38,7 @@ async def verify_email(credential_id, token):
 
  
 @auth_router.post("/auth/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login():
     return {
         "message": "logged in successful"
     }

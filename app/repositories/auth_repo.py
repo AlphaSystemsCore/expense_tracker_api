@@ -34,10 +34,10 @@ def get_verify_email_token_repo(credential_id:str):
         row = cur.fetchone()
     return row
 
-def update_verify_email_token_repo(credential_id, is_verified, is_used):
+def update_verify_email_token_repo(credential_id, is_used:bool, is_verified: bool| None = None):
     with get_cur() as cur:
         cur.execute("""UPDATE auth_credentials
-                    SET is_verified = %s 
+                    SET is_verified = COALESCE(%s, is_verified) 
                     WHERE credential_id = %s
                     """,
                     (is_verified,credential_id) 
