@@ -103,9 +103,12 @@ tables = ("""
         )
 
 if  __name__ == "__main__":
+        exp_cat = ['Scholarships', 'Allowance', 'Part-time Jobs', 'Freelance gigs', 'Stipends', 'Business venture', 'Competion & Awards', 'Miscellaneous Income']
+
         with get_cur() as cur:
-                count = 0
-                for table in tables:
-                        cur.execute(table)
-                        count +=1
-                print(count)
+                for cat in exp_cat:
+                        cur.execute("""
+                                INSERT INTO income_categorization
+                                (category) VALUES(%s)
+                                """,(cat,)
+                        )

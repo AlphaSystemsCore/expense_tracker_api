@@ -1,0 +1,2 @@
+class DateTimeExtractionError(Exception):
+    pass
